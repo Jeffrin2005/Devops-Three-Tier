@@ -14,6 +14,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 checkout scm
+                
                 echo "✅ Code checkout successful!"
             }
         }
