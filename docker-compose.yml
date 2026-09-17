@@ -1,0 +1,23 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  backend:
+    build: 
+      context: ./server
+    container_name: hr-backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env   # Loads your MongoDB URL from the server folder
+    restart: always
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: hr-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always

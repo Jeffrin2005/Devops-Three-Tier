@@ -1,0 +1,36 @@
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hr-frontend
+spec:
+  replicas: 2      # 2 copies of frontend
+  selector:
+    matchLabels:
+      app: hr-frontend
+  template:
+    metadata:
+      labels:
+        app: hr-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: jeffrinjojo/hr-frontend:latest
+        ports:
+        - containerPort: 80
+
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  selector:
+    app: hr-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30000    # You will use this port to view the app
+  type: NodePort         # Exposes the app to your laptop browser
