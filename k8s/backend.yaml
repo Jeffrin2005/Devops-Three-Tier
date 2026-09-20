@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: jeffrinjojo/hr-backend:latest    # We will update this when we push to Docker Hub
+        image: jeffrinjojo/hr-backend:9
         ports:
         - containerPort: 5000
         env:
