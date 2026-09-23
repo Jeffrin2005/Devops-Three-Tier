@@ -26,11 +26,42 @@ pipeline {
             }
         }
 
+        stage('Code Quality Analysis (SAST)') {
+            steps {
+                echo "🔍 Running SonarQube Analysis..."
+                script {
+                    def scannerHome = tool 'sonar-scanner'
+                    withSonarQubeEnv('sonarqube') {
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Hr-Project -Dsonar.sources=./server,./frontend"
+                    }
+                }
+            }
+        }
+
+        stage('IaC Security Scan (Checkov)') {
+            steps {
+                echo "🛡️ Scanning Kubernetes & Terraform files for security misconfigurations..."
+                // NOTE: Checkov must be installed on the Jenkins agent (e.g. `pip install checkov`)
+                sh 'checkov -d ${K8S_DIR} --soft-fail'
+                // sh 'checkov -d ./terraform --soft-fail'
+            }
+        }
+
         stage('Build Docker Images') {
             steps {
                 echo "🐳 Building Docker images..."
                 sh 'docker build -t $FRONTEND_IMAGE:$IMAGE_TAG ./frontend'
                 sh 'docker build -t $BACKEND_IMAGE:$IMAGE_TAG ./server'
+            }
+        }
+
+        stage('Container Image Vulnerability Scan') {
+            steps {
+                echo "🕵️ Running Trivy vulnerability scanner on images..."
+                // NOTE: Trivy must be installed on the Jenkins agent
+                // --exit-code 0 ensures it doesn't fail the build immediately while testing. Change to 1 for strict enforcement.
+                sh 'trivy image --severity HIGH,CRITICAL --no-progress --exit-code 0 $FRONTEND_IMAGE:$IMAGE_TAG'
+                sh 'trivy image --severity HIGH,CRITICAL --no-progress --exit-code 0 $BACKEND_IMAGE:$IMAGE_TAG'
             }
         }
 
