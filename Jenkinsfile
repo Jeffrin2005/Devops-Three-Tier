@@ -38,6 +38,16 @@ pipeline {
             }
         }
 
+        stage('Quality Gate Check') {
+            steps {
+                echo "🛑 Waiting for SonarQube to approve the code quality..."
+                timeout(time: 5, unit: 'MINUTES') {
+                    // This pauses the pipeline until SonarQube sends a webhook back saying "PASS" or "FAIL"
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
         stage('IaC Security Scan (Checkov)') {
             steps {
                 echo "🛡️ Scanning Kubernetes & Terraform files for security misconfigurations..."
