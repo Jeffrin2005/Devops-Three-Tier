@@ -32,7 +32,7 @@ pipeline {
                 script {
                     def scannerHome = tool 'sonar-scanner'
                     withSonarQubeEnv('sonarqube') {
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Hr-Project -Dsonar.sources=./server,./frontend"
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Hr-Project -Dsonar.sources=./server,./frontend -Dsonar.login=$SONAR_AUTH_TOKEN"
                     }
                 }
             }
